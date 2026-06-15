@@ -13,12 +13,12 @@ Open the repo in VS Code and select **Reopen in Container**.
 
 ## Tooling
 
-All tools are installed from pinned URLs with SHA256 digest verification at build time.
+All tools are installed from pinned URLs with SHA256 digest verification at build time. Terraform version is managed by tfenv and pinned in [.terraform-version](.terraform-version).
 
 | Tool           | Version |
 | -------------- | ------- |
 | Azure CLI      | 2.73.0  |
-| Terraform      | 1.15.5  |
+| tfenv          | latest  |
 | TFLint         | 0.61.0  |
 | Checkov        | 3.2.529 |
 | terraform-docs | 0.24.0  |

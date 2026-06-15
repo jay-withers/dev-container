@@ -21,10 +21,13 @@ jobs:
         with:
           node-version: "24"
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: "1.15.5"
+      - name: Install tfenv
+        run: |
+          git clone --depth=1 https://github.com/tfutils/tfenv.git ~/.tfenv
+          echo "$HOME/.tfenv/bin" >> "$GITHUB_PATH"
+
+      - name: Install Terraform
+        run: tfenv install
 
       - name: Set up TFLint
         uses: terraform-linters/setup-tflint@v4
@@ -59,7 +62,8 @@ jobs:
           key: pre-commit-${{ hashFiles('config/.pre-commit-config.yaml') }}
 
       - name: Terraform init
-        run: terraform -chdir=terraform init
+        run: terraform init
+        working-directory: terraform
 
       - name: Run pre-commit
         env:

@@ -19,6 +19,9 @@ fi
 git config --global user.name  "$GIT_NAME"
 git config --global user.email "$GIT_EMAIL"
 
+# Install the Terraform version pinned in .terraform-version
+tfenv install
+
 # Required when the repo is bind-mounted and owned by a different UID than the container user
 git config --global --add safe.directory /workspaces/dev-container
 

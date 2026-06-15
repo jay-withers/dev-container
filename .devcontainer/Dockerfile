@@ -5,7 +5,6 @@ ARG CHECKOV_URL="https://github.com/bridgecrewio/checkov/releases/download/3.2.5
 ARG NODE_URL="https://nodejs.org/dist/v24.16.0/node-v24.16.0-linux-arm64.tar.xz@sha256:524659219d6a207a7400f2bde15d19ba060ffbe0d32a8643319ad67e3bb64c78"
 ARG PRE_COMMIT_URL="https://github.com/pre-commit/pre-commit/releases/download/v3.7.1/pre-commit-3.7.1.pyz@sha256:a0349324f0f53b08d00eb473b5f6646c8a07f3253703c09b977b0b9b9476d486"
 ARG TERRAFORM_DOCS_URL="https://github.com/terraform-docs/terraform-docs/releases/download/v0.24.0/terraform-docs-v0.24.0-linux-arm64.tar.gz@sha256:d12bd7b73c1fc9c64efc79f8157dd713dabd559f1ecf3cfc0f42e32279a155fd"
-ARG TERRAFORM_URL="https://releases.hashicorp.com/terraform/1.15.5/terraform_1.15.5_linux_arm64.zip@sha256:06e7b48de826146c6d9331ba35b13da12332d8392be30d1dd6b789ba4713fff0"
 ARG TFLINT_URL="https://github.com/terraform-linters/tflint/releases/download/v0.61.0/tflint_linux_arm64.zip@sha256:999c25cfdb5208fe1133dec6b219e666a39fc2a7a0786a781dc9924ea5945ebf"
 
 # Base dependencies
@@ -22,15 +21,6 @@ RUN URL="${AZURE_CLI_URL%@sha256:*}" \
     && rm /tmp/azure-cli.deb \
     && rm -rf /var/lib/apt/lists/* \
     && az --version
-
-# terraform with pinned SHA256 digest
-RUN URL="${TERRAFORM_URL%@sha256:*}" \
-    && SHA="${TERRAFORM_URL##*@sha256:}" \
-    && curl -fsSL "${URL}" -o /tmp/terraform.zip \
-    && (cd /tmp && echo "${SHA}  terraform.zip" | sha256sum -c) \
-    && unzip /tmp/terraform.zip terraform -d /usr/local/bin \
-    && rm /tmp/terraform.zip \
-    && terraform version
 
 # checkov binary with pinned SHA256 digest
 RUN URL="${CHECKOV_URL%@sha256:*}" \
@@ -79,5 +69,11 @@ RUN URL="${NODE_URL%@sha256:*}" \
     && tar -xJ -C /usr/local --strip-components=1 -f /tmp/node.tar.xz \
     && rm /tmp/node.tar.xz \
     && node --version
+
+# tfenv — terraform version controlled by .terraform-version in the workspace
+RUN git clone --depth=1 https://github.com/tfutils/tfenv.git /home/vscode/.tfenv \
+    && chown -R vscode:vscode /home/vscode/.tfenv
+
+ENV PATH="/home/vscode/.tfenv/bin:${PATH}"
 
 USER vscode
