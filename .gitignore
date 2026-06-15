@@ -1,3 +1,6 @@
+# Dev container — git identity captured from host, must not be committed
+.devcontainer/.git-env
+
 # Local .terraform directories
 .terraform/
 
