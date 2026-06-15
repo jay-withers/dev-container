@@ -97,8 +97,5 @@
     "fileMatch": [
       "(^|/)config/\\.pre-commit-config\\.yaml$"
     ]
-  },
-  "statusCheckNames": {
-    "minimumReleaseAge": "renovate/stability-days"
   }
 }
