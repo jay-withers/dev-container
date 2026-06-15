@@ -71,6 +71,23 @@ Two MCP servers are configured for Claude Code automatically on container creati
 | Azure MCP (`@azure/mcp`)      | Interact with Azure resources, query subscriptions, resource groups, and services |
 | Microsoft Learn               | Search and fetch official Microsoft and Azure documentation                |
 
+## Dependency updates
+
+[Renovate](https://docs.renovatebot.com/) is configured in [renovate.json](renovate.json) to keep pinned versions up to date automatically. It raises PRs for:
+
+- GitHub Actions (`uses:` pins in workflows)
+- Pre-commit hook revisions (`config/.pre-commit-config.yaml`)
+- Dockerfile `FROM` base image
+- Tool versions in Dockerfile ARGs (TFLint, Checkov, terraform-docs, pre-commit, Node.js)
+
+Renovate will auto-approve and auto-merge PRs (squash) once the `pre-commit` workflow passes.
+
+To enable it, install the [Renovate GitHub App](https://github.com/apps/renovate) on the repository.
+
+## VS Code without Docker
+
+If you open the repo without the dev container, VS Code will prompt you to install the recommended extensions defined in [.vscode/extensions.json](.vscode/extensions.json).
+
 ## Home directory mount
 
 The host home directory is mounted at `/host-home` inside the container, giving access to host SSH keys, credentials, and other config without copying them into the image.
