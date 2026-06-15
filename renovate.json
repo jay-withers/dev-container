@@ -1,0 +1,101 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "automerge": true,
+  "automergeStrategy": "squash",
+  "automergeType": "pr",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "terraform-linters/tflint",
+      "fileMatch": [
+        "^\\.devcontainer/Dockerfile$"
+      ],
+      "matchStrings": [
+        "ARG TFLINT_URL=\"https://github\\.com/terraform-linters/tflint/releases/download/v(?<currentValue>[^/]+)/[^\"]+\""
+      ],
+      "packageNameTemplate": "terraform-linters/tflint",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "bridgecrewio/checkov",
+      "fileMatch": [
+        "^\\.devcontainer/Dockerfile$"
+      ],
+      "matchStrings": [
+        "ARG CHECKOV_URL=\"https://github\\.com/bridgecrewio/checkov/releases/download/(?<currentValue>[^/]+)/[^\"]+\""
+      ],
+      "packageNameTemplate": "bridgecrewio/checkov",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "terraform-docs/terraform-docs",
+      "fileMatch": [
+        "^\\.devcontainer/Dockerfile$"
+      ],
+      "matchStrings": [
+        "ARG TERRAFORM_DOCS_URL=\"https://github\\.com/terraform-docs/terraform-docs/releases/download/v(?<currentValue>[^/]+)/[^\"]+\""
+      ],
+      "packageNameTemplate": "terraform-docs/terraform-docs",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "pre-commit/pre-commit",
+      "fileMatch": [
+        "^\\.devcontainer/Dockerfile$"
+      ],
+      "matchStrings": [
+        "ARG PRE_COMMIT_URL=\"https://github\\.com/pre-commit/pre-commit/releases/download/v(?<currentValue>[^/]+)/[^\"]+\""
+      ],
+      "packageNameTemplate": "pre-commit/pre-commit",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "datasourceTemplate": "node-version",
+      "depNameTemplate": "node",
+      "fileMatch": [
+        "^\\.devcontainer/Dockerfile$"
+      ],
+      "matchStrings": [
+        "ARG NODE_URL=\"https://nodejs\\.org/dist/v(?<currentValue>[^/]+)/[^\"]+\""
+      ],
+      "versioningTemplate": "node"
+    }
+  ],
+  "extends": [
+    "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "groupName": "GitHub Actions",
+      "matchManagers": [
+        "github-actions"
+      ]
+    },
+    {
+      "groupName": "pre-commit hooks",
+      "matchManagers": [
+        "pre-commit"
+      ]
+    },
+    {
+      "groupName": "dev container tools",
+      "matchFiles": [
+        ".devcontainer/Dockerfile"
+      ]
+    }
+  ],
+  "platformAutomerge": true,
+  "pre-commit": {
+    "fileMatch": [
+      "(^|/)config/\\.pre-commit-config\\.yaml$"
+    ]
+  }
+}
