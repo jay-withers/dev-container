@@ -94,4 +94,4 @@ The host home directory is mounted at `/host-home` inside the container, giving 
 
 ## Terraform example
 
-The `terraform/` directory contains a simple Azure Resource Group module used as a working example for the tooling and pre-commit hooks. See [terraform/README.md](terraform/README.md) for details.
+The `terraform/` directory contains a simple Azure Resource Group module used as a working example for the tooling and pre-commit hooks. See [terraform/README.md](terraform/README.md) for details!
