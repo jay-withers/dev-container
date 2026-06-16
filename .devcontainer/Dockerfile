@@ -13,7 +13,7 @@ ARG TFLINT_URL="https://github.com/terraform-linters/tflint/releases/download/v0
 
 # Base dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        curl unzip xz-utils python3 \
+        bash-completion curl unzip xz-utils python3 \
     && rm -rf /var/lib/apt/lists/*
 
 # azure-cli with pinned SHA256 digest
@@ -63,7 +63,8 @@ RUN URL="${TERRAFORM_DOCS_URL%@sha256:*}" \
     && tar -xz -C /usr/local/bin -f /tmp/terraform-docs.tar.gz terraform-docs \
     && chmod +x /usr/local/bin/terraform-docs \
     && rm /tmp/terraform-docs.tar.gz \
-    && terraform-docs --version
+    && terraform-docs --version \
+    && terraform-docs completion bash > /etc/bash_completion.d/terraform-docs
 
 # node with pinned SHA256 digest
 RUN URL="${NODE_URL%@sha256:*}" \
@@ -80,7 +81,8 @@ RUN URL="${KUBECTL_URL%@sha256:*}" \
     && curl -fsSL "${URL}" -o /usr/local/bin/kubectl \
     && (cd /usr/local/bin && echo "${SHA}  kubectl" | sha256sum -c) \
     && chmod +x /usr/local/bin/kubectl \
-    && kubectl version --client
+    && kubectl version --client \
+    && kubectl completion bash > /etc/bash_completion.d/kubectl
 
 # kubectx with pinned SHA256 digest
 RUN URL="${KUBECTX_URL%@sha256:*}" \
@@ -98,7 +100,8 @@ RUN URL="${HELM_URL%@sha256:*}" \
     && (cd /tmp && echo "${SHA}  helm.tar.gz" | sha256sum -c) \
     && tar -xz -C /usr/local/bin --strip-components=1 -f /tmp/helm.tar.gz linux-arm64/helm \
     && rm /tmp/helm.tar.gz \
-    && helm version
+    && helm version \
+    && helm completion bash > /etc/bash_completion.d/helm
 
 # k9s with pinned SHA256 digest
 RUN URL="${K9S_URL%@sha256:*}" \

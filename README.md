@@ -15,6 +15,8 @@ Open the repo in VS Code and select **Reopen in Container**.
 
 All tools are installed from pinned URLs with SHA256 digest verification at build time. Terraform version is managed by tfenv and pinned in [.terraform-version](.terraform-version).
 
+Shell (bash) tab completion is enabled for: Azure CLI, kubectl, helm, terraform-docs, and terraform.
+
 | Tool           | Version |
 | -------------- | ------- |
 | Azure CLI      | 2.73.0  |
