@@ -14,7 +14,8 @@
         "ms-vscode.powershell",
         "anthropic.claude-code",
         "DavidAnson.vscode-markdownlint",
-        "hashicorp.terraform"
+        "hashicorp.terraform",
+        "ms-kubernetes-tools.vscode-kubernetes-tools"
       ],
       "settings": {
         "[terraform]": {

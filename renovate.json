@@ -67,6 +67,45 @@
         "ARG NODE_URL=\"https://nodejs\\.org/dist/v(?<currentValue>[^/]+)/[^\"]+\""
       ],
       "versioningTemplate": "node"
+    },
+    {
+      "customType": "regex",
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "kubernetes/kubernetes",
+      "fileMatch": [
+        "^\\.devcontainer/Dockerfile$"
+      ],
+      "matchStrings": [
+        "ARG KUBECTL_URL=\"https://dl\\.k8s\\.io/release/v(?<currentValue>[^/]+)/[^\"]+\""
+      ],
+      "packageNameTemplate": "kubernetes/kubernetes",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "helm/helm",
+      "fileMatch": [
+        "^\\.devcontainer/Dockerfile$"
+      ],
+      "matchStrings": [
+        "ARG HELM_URL=\"https://get\\.helm\\.sh/helm-v(?<currentValue>[^-]+)-[^\"]+\""
+      ],
+      "packageNameTemplate": "helm/helm",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "derailed/k9s",
+      "fileMatch": [
+        "^\\.devcontainer/Dockerfile$"
+      ],
+      "matchStrings": [
+        "ARG K9S_URL=\"https://github\\.com/derailed/k9s/releases/download/v(?<currentValue>[^/]+)/[^\"]+\""
+      ],
+      "packageNameTemplate": "derailed/k9s",
+      "versioningTemplate": "semver"
     }
   ],
   "extends": [

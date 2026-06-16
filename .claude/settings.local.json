@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -fsSL https://get.helm.sh/helm-v4.2.1-linux-arm64.tar.gz.sha256sum)",
+      "Bash(curl -fsSL https://github.com/derailed/k9s/releases/download/v0.51.0/checksums.sha256)",
+      "Bash(grep -E \"k9s_Linux_arm64\\\\.tar\\\\.gz$\")",
+      "WebFetch(domain:github.com)"
+    ]
+  }
+}
