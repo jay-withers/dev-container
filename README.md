@@ -76,6 +76,15 @@ Two MCP servers are configured for Claude Code automatically on container creati
 | Azure MCP (`@azure/mcp`) | Interact with Azure resources, query subscriptions, resource groups, and services |
 | Microsoft Learn          | Search and fetch official Microsoft and Azure documentation                       |
 
+## CI
+
+Two workflows run on every pull request to `main`:
+
+| Workflow          | What it does                                                                             |
+| ----------------- | ---------------------------------------------------------------------------------------- |
+| `pre-commit`      | Installs all tools and runs `pre-commit run --all-files` to validate hooks               |
+| `container-build` | Builds the dev container image for `linux/arm64` via QEMU and smoke-tests each tool      |
+
 ## Dependency updates
 
 [Renovate](https://docs.renovatebot.com/) is configured in [renovate.json](renovate.json) to keep pinned versions up to date automatically. It raises PRs for:
@@ -85,7 +94,7 @@ Two MCP servers are configured for Claude Code automatically on container creati
 - Dockerfile `FROM` base image
 - Tool versions in Dockerfile ARGs (TFLint, Checkov, terraform-docs, pre-commit, Node.js)
 
-Renovate will auto-approve and auto-merge PRs (squash) once the `pre-commit` workflow passes.
+Renovate will auto-approve and auto-merge PRs (squash) once the `pre-commit` and `container-build` workflows pass.
 
 To enable it, install the [Renovate GitHub App](https://github.com/apps/renovate) on the repository.
 
