@@ -29,6 +29,9 @@
   ],
   "name": "Azure Terraform Dev Container",
   "postCreateCommand": "sh .devcontainer/post-create.sh",
+  "remoteEnv": {
+    "PATH": "/home/vscode/.tfenv/bin:${containerEnv:PATH}"
+  },
   "remoteUser": "vscode",
   "runArgs": [
     "--security-opt=no-new-privileges:true"
