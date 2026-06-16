@@ -14,7 +14,8 @@
         "ms-vscode.powershell",
         "anthropic.claude-code",
         "DavidAnson.vscode-markdownlint",
-        "hashicorp.terraform"
+        "hashicorp.terraform",
+        "ms-kubernetes-tools.vscode-kubernetes-tools"
       ],
       "settings": {
         "[terraform]": {
@@ -29,6 +30,9 @@
   ],
   "name": "Azure Terraform Dev Container",
   "postCreateCommand": "sh .devcontainer/post-create.sh",
+  "remoteEnv": {
+    "PATH": "/home/vscode/.tfenv/bin:${containerEnv:PATH}"
+  },
   "remoteUser": "vscode",
   "runArgs": [
     "--security-opt=no-new-privileges:true"

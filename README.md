@@ -15,6 +15,8 @@ Open the repo in VS Code and select **Reopen in Container**.
 
 All tools are installed from pinned URLs with SHA256 digest verification at build time. Terraform version is managed by tfenv and pinned in [.terraform-version](.terraform-version).
 
+Shell (bash) tab completion is enabled for: Azure CLI, kubectl, helm, terraform-docs, and terraform.
+
 | Tool           | Version |
 | -------------- | ------- |
 | Azure CLI      | 2.73.0  |
@@ -24,21 +26,26 @@ All tools are installed from pinned URLs with SHA256 digest verification at buil
 | terraform-docs | 0.24.0  |
 | pre-commit     | 3.7.1   |
 | Node.js        | 24.16.0 |
+| kubectl        | 1.36.2  |
+| helm           | 4.2.1   |
+| k9s            | 0.51.0  |
+| kubectx        | 0.11.0  |
 
 ## VS Code extensions
 
-| Extension                                  | Purpose                               |
-| ------------------------------------------ | ------------------------------------- |
-| `hashicorp.terraform`                      | Terraform language support and formatting |
-| `ms-azuretools.vscode-azureterraform`      | Azure Terraform integration           |
-| `ms-azuretools.vscode-azureresourcegroups` | Browse Azure resources                |
-| `ms-azure-devops.azure-pipelines`          | Azure Pipelines YAML support          |
-| `anthropic.claude-code`                    | Claude AI assistant                   |
-| `ms-vscode.powershell`                     | PowerShell language support           |
-| `eamodio.gitlens`                          | Enhanced git tooling                  |
-| `redhat.vscode-yaml`                       | YAML language support                 |
-| `timonwong.shellcheck`                     | Shell script linting                  |
-| `DavidAnson.vscode-markdownlint`           | Markdown linting                      |
+| Extension                                        | Purpose                                   |
+| ------------------------------------------------ | ----------------------------------------- |
+| `hashicorp.terraform`                            | Terraform language support and formatting |
+| `ms-azuretools.vscode-azureterraform`            | Azure Terraform integration               |
+| `ms-azuretools.vscode-azureresourcegroups`       | Browse Azure resources                    |
+| `ms-azure-devops.azure-pipelines`                | Azure Pipelines YAML support              |
+| `anthropic.claude-code`                          | Claude AI assistant                       |
+| `ms-vscode.powershell`                           | PowerShell language support               |
+| `eamodio.gitlens`                                | Enhanced git tooling                      |
+| `redhat.vscode-yaml`                             | YAML language support                     |
+| `timonwong.shellcheck`                           | Shell script linting                      |
+| `DavidAnson.vscode-markdownlint`                 | Markdown linting                          |
+| `ms-kubernetes-tools.vscode-kubernetes-tools`    | Kubernetes cluster and manifest support   |
 
 ## Pre-commit hooks
 
@@ -66,10 +73,19 @@ pre-commit run --all-files --config config/.pre-commit-config.yaml
 
 Two MCP servers are configured for Claude Code automatically on container creation:
 
-| Server                        | Purpose                                                                    |
-| ----------------------------- | -------------------------------------------------------------------------- |
-| Azure MCP (`@azure/mcp`)      | Interact with Azure resources, query subscriptions, resource groups, and services |
-| Microsoft Learn               | Search and fetch official Microsoft and Azure documentation                |
+| Server                   | Purpose                                                                           |
+| ------------------------ | --------------------------------------------------------------------------------- |
+| Azure MCP (`@azure/mcp`) | Interact with Azure resources, query subscriptions, resource groups, and services |
+| Microsoft Learn          | Search and fetch official Microsoft and Azure documentation                       |
+
+## CI
+
+Two workflows run on every pull request to `main`:
+
+| Workflow          | What it does                                                                             |
+| ----------------- | ---------------------------------------------------------------------------------------- |
+| `pre-commit`      | Installs all tools and runs `pre-commit run --all-files` to validate hooks               |
+| `container-build` | Builds the dev container image for `linux/arm64` via QEMU and smoke-tests each tool      |
 
 ## Dependency updates
 
@@ -80,7 +96,7 @@ Two MCP servers are configured for Claude Code automatically on container creati
 - Dockerfile `FROM` base image
 - Tool versions in Dockerfile ARGs (TFLint, Checkov, terraform-docs, pre-commit, Node.js)
 
-Renovate will auto-approve and auto-merge PRs (squash) once the `pre-commit` workflow passes.
+Renovate will auto-approve and auto-merge PRs (squash) once the `pre-commit` and `container-build` workflows pass.
 
 To enable it, install the [Renovate GitHub App](https://github.com/apps/renovate) on the repository.
 

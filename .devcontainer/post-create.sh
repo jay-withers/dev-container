@@ -22,6 +22,11 @@ git config --global user.email "$GIT_EMAIL"
 # Install the Terraform version pinned in .terraform-version
 tfenv install
 
+# Install Terraform shell completion (writes a complete line to ~/.bashrc)
+if ! grep -q 'complete.*terraform' "$HOME/.bashrc" 2>/dev/null; then
+  terraform -install-autocomplete
+fi
+
 # Required when the repo is bind-mounted and owned by a different UID than the container user
 git config --global --add safe.directory /workspaces/dev-container
 
