@@ -30,6 +30,8 @@ Shell (bash) tab completion is enabled for: Azure CLI, kubectl, helm, terraform-
 | helm           | 4.2.1   |
 | k9s            | 0.51.0  |
 | kubectx        | 0.11.0  |
+| PowerShell     | 7.6.3   |
+| Az module      | latest  |
 
 ## VS Code extensions
 
@@ -94,7 +96,7 @@ Two workflows run on every pull request to `main`:
 - GitHub Actions (`uses:` pins in workflows)
 - Pre-commit hook revisions (`config/.pre-commit-config.yaml`)
 - Dockerfile `FROM` base image
-- Tool versions in Dockerfile ARGs (TFLint, Checkov, terraform-docs, pre-commit, Node.js)
+- Tool versions in Dockerfile ARGs (TFLint, Checkov, terraform-docs, pre-commit, Node.js, PowerShell)
 
 Renovate will auto-approve and auto-merge PRs (squash) once the `pre-commit` and `container-build` workflows pass.
 

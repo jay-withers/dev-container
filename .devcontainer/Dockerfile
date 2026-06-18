@@ -7,6 +7,7 @@ ARG K9S_URL="https://github.com/derailed/k9s/releases/download/v0.51.0/k9s_Linux
 ARG KUBECTL_URL="https://dl.k8s.io/release/v1.36.2/bin/linux/arm64/kubectl@sha256:c957eb8c4bea27a3bb35b269edd9082e27f027f7b76b20b5bf4afebc726c6d3e"
 ARG KUBECTX_URL="https://github.com/ahmetb/kubectx/releases/download/v0.11.0/kubectx_v0.11.0_linux_arm64.tar.gz@sha256:1dac2072216689e773325cb7587b858ea7415706ebcf04e23bf80e7e70555340"
 ARG NODE_URL="https://nodejs.org/dist/v24.16.0/node-v24.16.0-linux-arm64.tar.xz@sha256:524659219d6a207a7400f2bde15d19ba060ffbe0d32a8643319ad67e3bb64c78"
+ARG POWERSHELL_URL="https://github.com/PowerShell/PowerShell/releases/download/v7.6.3/powershell-7.6.3-linux-arm64.tar.gz@sha256:7a14a385eca7dc5bedc1c8aa3d8b765f449ada30aabe5785a9fd331266eb062d"
 ARG PRE_COMMIT_URL="https://github.com/pre-commit/pre-commit/releases/download/v3.7.1/pre-commit-3.7.1.pyz@sha256:a0349324f0f53b08d00eb473b5f6646c8a07f3253703c09b977b0b9b9476d486"
 ARG TERRAFORM_DOCS_URL="https://github.com/terraform-docs/terraform-docs/releases/download/v0.24.0/terraform-docs-v0.24.0-linux-arm64.tar.gz@sha256:d12bd7b73c1fc9c64efc79f8157dd713dabd559f1ecf3cfc0f42e32279a155fd"
 ARG TFLINT_URL="https://github.com/terraform-linters/tflint/releases/download/v0.61.0/tflint_linux_arm64.zip@sha256:999c25cfdb5208fe1133dec6b219e666a39fc2a7a0786a781dc9924ea5945ebf"
@@ -111,6 +112,23 @@ RUN URL="${K9S_URL%@sha256:*}" \
     && tar -xz -C /usr/local/bin -f /tmp/k9s.tar.gz k9s \
     && rm /tmp/k9s.tar.gz \
     && k9s version
+
+# PowerShell with pinned SHA256 digest
+RUN URL="${POWERSHELL_URL%@sha256:*}" \
+    && SHA="${POWERSHELL_URL##*@sha256:}" \
+    && curl -fsSL "${URL}" -o /tmp/powershell.tar.gz \
+    && (cd /tmp && echo "${SHA}  powershell.tar.gz" | sha256sum -c) \
+    && mkdir -p /opt/microsoft/powershell/7 \
+    && tar -xz -C /opt/microsoft/powershell/7 -f /tmp/powershell.tar.gz \
+    && chmod +x /opt/microsoft/powershell/7/pwsh \
+    && ln -s /opt/microsoft/powershell/7/pwsh /usr/local/bin/pwsh \
+    && rm /tmp/powershell.tar.gz \
+    && pwsh --version
+
+# Az PowerShell module
+RUN pwsh -NoLogo -NonInteractive -Command "\
+    Set-PSRepository PSGallery -InstallationPolicy Trusted; \
+    Install-Module -Name Az -Force -Scope AllUsers"
 
 # tfenv — terraform version controlled by .terraform-version in the workspace
 RUN git clone --depth=1 https://github.com/tfutils/tfenv.git /home/vscode/.tfenv \

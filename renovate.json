@@ -106,6 +106,19 @@
       ],
       "packageNameTemplate": "derailed/k9s",
       "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "PowerShell/PowerShell",
+      "fileMatch": [
+        "^\\.devcontainer/Dockerfile$"
+      ],
+      "matchStrings": [
+        "ARG POWERSHELL_URL=\"https://github\\.com/PowerShell/PowerShell/releases/download/v(?<currentValue>[^/]+)/[^\"]+\""
+      ],
+      "packageNameTemplate": "PowerShell/PowerShell",
+      "versioningTemplate": "semver"
     }
   ],
   "extends": [
