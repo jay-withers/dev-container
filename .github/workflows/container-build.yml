@@ -5,7 +5,22 @@ on:
     branches: [main]
 
 jobs:
+  changes:
+    runs-on: ubuntu-24.04
+    outputs:
+      devcontainer: ${{ steps.filter.outputs.devcontainer }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            devcontainer:
+              - '.devcontainer/**'
+
   build:
+    needs: changes
+    if: needs.changes.outputs.devcontainer == 'true'
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
