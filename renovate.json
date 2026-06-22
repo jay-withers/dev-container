@@ -1,5 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "autoApprove": true,
   "automerge": true,
   "automergeStrategy": "squash",
   "automergeType": "pr",
@@ -136,5 +137,8 @@
     "fileMatch": [
       "(^|/)config/\\.pre-commit-config\\.yaml$"
     ]
-  }
+  },
+  "schedule": [
+    "once a week"
+  ]
 }
