@@ -61,6 +61,7 @@ Hooks are installed automatically when the container is created. The following r
 | `gitleaks`             | Secret scanning                                                                   |
 | `actionlint`           | GitHub Actions workflow linting                                                   |
 | `commitlint`           | Conventional commit message format (commit-msg stage)                             |
+| `shellcheck`           | Shell script linting                                                              |
 | Standard hooks         | Trailing whitespace, EOF newline, YAML/JSON/Azure Pipelines validity, large files |
 
 To run hooks manually:
@@ -80,12 +81,12 @@ Two MCP servers are configured for Claude Code automatically on container creati
 
 ## CI
 
-Two workflows run on every pull request to `main`:
+Two workflows run on pull requests to `main`:
 
-| Workflow          | What it does                                                                             |
-| ----------------- | ---------------------------------------------------------------------------------------- |
-| `pre-commit`      | Installs all tools and runs `pre-commit run --all-files` to validate hooks               |
-| `container-build` | Builds the dev container image for `linux/arm64` via QEMU and smoke-tests each tool      |
+| Workflow          | When it runs                          | What it does                                                                        |
+| ----------------- | ------------------------------------- | ----------------------------------------------------------------------------------- |
+| `pre-commit`      | Every PR                              | Installs all tools and runs `pre-commit run --all-files` to validate hooks          |
+| `container-build` | PRs that change `.devcontainer/**`    | Builds the dev container image for `linux/arm64` via QEMU and smoke-tests each tool |
 
 ## Dependency updates
 
@@ -99,10 +100,6 @@ Two workflows run on every pull request to `main`:
 Renovate will auto-approve and auto-merge PRs (squash) once the `pre-commit` and `container-build` workflows pass.
 
 To enable it, install the [Renovate GitHub App](https://github.com/apps/renovate) on the repository.
-
-## VS Code without Docker
-
-If you open the repo without the dev container, VS Code will prompt you to install the recommended extensions defined in [.vscode/extensions.json](.vscode/extensions.json).
 
 ## Home directory mount
 
