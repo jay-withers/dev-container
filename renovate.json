@@ -9,7 +9,7 @@
       "customType": "regex",
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "terraform-linters/tflint",
-      "fileMatch": [
+      "managerFilePaths": [
         "^images/terraform/Dockerfile$"
       ],
       "matchStrings": [
@@ -22,7 +22,7 @@
       "customType": "regex",
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "bridgecrewio/checkov",
-      "fileMatch": [
+      "managerFilePaths": [
         "^images/terraform/Dockerfile$"
       ],
       "matchStrings": [
@@ -35,7 +35,7 @@
       "customType": "regex",
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "terraform-docs/terraform-docs",
-      "fileMatch": [
+      "managerFilePaths": [
         "^images/terraform/Dockerfile$"
       ],
       "matchStrings": [
@@ -48,7 +48,7 @@
       "customType": "regex",
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "pre-commit/pre-commit",
-      "fileMatch": [
+      "managerFilePaths": [
         "^images/base/Dockerfile$"
       ],
       "matchStrings": [
@@ -61,7 +61,7 @@
       "customType": "regex",
       "datasourceTemplate": "node-version",
       "depNameTemplate": "node",
-      "fileMatch": [
+      "managerFilePaths": [
         "^images/base/Dockerfile$"
       ],
       "matchStrings": [
@@ -73,7 +73,7 @@
       "customType": "regex",
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "kubernetes/kubernetes",
-      "fileMatch": [
+      "managerFilePaths": [
         "^images/k8s/Dockerfile$"
       ],
       "matchStrings": [
@@ -86,7 +86,7 @@
       "customType": "regex",
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "helm/helm",
-      "fileMatch": [
+      "managerFilePaths": [
         "^images/k8s/Dockerfile$"
       ],
       "matchStrings": [
@@ -99,7 +99,7 @@
       "customType": "regex",
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "derailed/k9s",
-      "fileMatch": [
+      "managerFilePaths": [
         "^images/k8s/Dockerfile$"
       ],
       "matchStrings": [
@@ -127,7 +127,7 @@
     },
     {
       "groupName": "dev container tools",
-      "matchFiles": [
+      "matchFileNames": [
         "images/base/Dockerfile",
         "images/terraform/Dockerfile",
         "images/k8s/Dockerfile"
@@ -136,7 +136,7 @@
   ],
   "platformAutomerge": true,
   "pre-commit": {
-    "fileMatch": [
+    "managerFilePaths": [
       "(^|/)config/\\.pre-commit-config\\.yaml$"
     ]
   },

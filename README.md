@@ -38,6 +38,7 @@ To pin to a specific image version rather than `latest`, use a semver tag:
 ## Prerequisites (for local use)
 
 - [Docker](https://www.docker.com/get-started/) installed and running
+- An `arm64` host — all images pin `arm64` binaries and CI only builds `linux/arm64`, so `make build` will fail on an `amd64` machine
 
 ## Repository layout
 
@@ -47,7 +48,7 @@ images/
   terraform/Dockerfile   # FROM base + tflint, checkov, terraform-docs, tfenv
   k8s/Dockerfile         # FROM base + kubectl, kubectx, helm, k9s
 config/                  # shared pre-commit and tooling config
-.devcontainer/           # this repo's own dev container (uses the base image)
+Makefile                 # setup / lint / build targets (run `make help`)
 ```
 
 ## Tooling versions
@@ -72,7 +73,7 @@ Shell (bash) tab completion is enabled for: Azure CLI, kubectl, helm, terraform-
 
 ## VS Code extensions
 
-This repo's own dev container ([.devcontainer/devcontainer.json](.devcontainer/devcontainer.json)) enables the extensions used to maintain the images:
+Recommended extensions for working on the images:
 
 | Extension                          | Purpose                          |
 | ---------------------------------- | -------------------------------- |
@@ -98,10 +99,11 @@ This repo's own hooks (defined in [config/.pre-commit-config.yaml](config/.pre-c
 | `shellcheck`           | Shell script linting                                                                          |
 | Standard hooks         | Trailing whitespace, EOF newline, YAML/JSON validity, merge conflicts, large files            |
 
-To run hooks manually:
+Install the hooks and run them manually via the [Makefile](Makefile):
 
 ```sh
-pre-commit run --all-files --config config/.pre-commit-config.yaml
+make setup   # install the pre-commit git hooks
+make lint    # run all hooks against every file
 ```
 
 ## CI

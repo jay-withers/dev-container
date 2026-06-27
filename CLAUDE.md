@@ -10,27 +10,15 @@ When you add, remove, or significantly change a feature, command, or configurati
 
 A catalog of VS Code dev container images for Azure infrastructure development. Each image is defined under `images/<name>/Dockerfile`, built and published to the GitHub Container Registry (`ghcr.io/jay-withers/dev-container/<name>`), and consumed by other repos via an `image:` reference in their `.devcontainer/devcontainer.json`. There is no application code — the primary deliverable is the set of container images.
 
-## Common commands
-
-Run all pre-commit hooks against every file (the standard way to validate changes):
+Common tasks are wrapped in the `Makefile` (run `make help` to list them):
 
 ```sh
-pre-commit run --all-files --config config/.pre-commit-config.yaml
+make setup   # install the pre-commit git hooks
+make lint    # run all pre-commit hooks against every file (the standard way to validate changes)
+make build   # build base, terraform, and k8s images locally
 ```
 
-Inside the container, a shell function in `~/.bashrc` wraps `pre-commit` to always pass `--config config/.pre-commit-config.yaml`, so inside the container you can just run:
-
-```sh
-pre-commit run --all-files
-```
-
-Build an image locally (from the repo root):
-
-```sh
-docker build -t base images/base
-docker build --build-arg BASE_IMAGE=base -t terraform images/terraform
-docker build --build-arg BASE_IMAGE=base -t k8s images/k8s
-```
+Individual image builds are also available (`make build-base`, `make build-terraform`, `make build-k8s`). The `lint`/`setup` targets pass `--config config/.pre-commit-config.yaml` to `pre-commit` for you; invoke `pre-commit` directly with that flag if not using the Makefile.
 
 ## Architecture
 
@@ -43,10 +31,6 @@ Images form a base + specialisation hierarchy under `images/`:
 - **`images/k8s/Dockerfile`** — `FROM` the base image. Adds kubectl, kubectx, helm, and k9s.
 
 Specialised images switch to `USER root` to install, then back to `USER vscode`. To add a new image, create `images/<name>/Dockerfile` `FROM` the base and add it to the `leaves` matrix in `tag.yml` and the build/smoke-test steps in `container-build.yml`.
-
-### This repo's own dev container
-
-- **`.devcontainer/devcontainer.json`** — references the published `base` image via `image:` (the base tooling is all that's needed to edit Dockerfiles, workflows, and config) and wires up VS Code extensions and format-on-save. A `postCreateCommand` runs `pre-commit install --config config/.pre-commit-config.yaml` to install the git hooks on container create.
 
 ### Pre-commit configuration
 
