@@ -93,10 +93,8 @@ This repo's own hooks (defined in [config/.pre-commit-config.yaml](config/.pre-c
 | ---------------------- | --------------------------------------------------------------------------------------------- |
 | `gitleaks`             | Secret scanning                                                                               |
 | `actionlint`           | GitHub Actions workflow linting                                                               |
-| `check-azure-pipelines`| Azure Pipelines YAML validity                                                                 |
 | `check-renovate`       | Renovate config validity                                                                      |
 | `commitlint`           | Conventional commit message format (commit-msg stage)                                         |
-| `shellcheck`           | Shell script linting                                                                          |
 | Standard hooks         | Trailing whitespace, EOF newline, YAML/JSON validity, merge conflicts, large files            |
 
 Install the hooks and run them manually via the [Makefile](Makefile):

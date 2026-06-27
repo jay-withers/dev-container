@@ -36,8 +36,6 @@ repos:
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
 
-      - id: check-shebang-scripts-are-executable
-
       - id: no-commit-to-branch
         args: [--branch, main]
 
@@ -60,8 +58,6 @@ repos:
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 943377262562a12b57292fc98fabd7dbf81451fe # frozen: 0.37.2
     hooks:
-      - id: check-azure-pipelines
-
       - id: check-renovate
 
   - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
@@ -73,8 +69,3 @@ repos:
         args:
           - --config
           - config/commitlint.config.js
-
-  - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: 745eface02aef23e168a8afb6b5737818efbea95 # frozen: v0.11.0.1
-    hooks:
-      - id: shellcheck

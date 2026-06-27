@@ -34,7 +34,7 @@ Specialised images switch to `USER root` to install, then back to `USER vscode`.
 
 ### Pre-commit configuration
 
-This repo's own hooks live in **`config/.pre-commit-config.yaml`** — secret scanning, workflow/config linting, commit-message and shell linting, plus the standard whitespace/format hooks. Hook revisions are frozen with a comment showing the upstream tag; Renovate keeps these updated automatically.
+This repo's own hooks live in **`config/.pre-commit-config.yaml`** — secret scanning, workflow/config linting, commit-message validation, plus the standard whitespace/format hooks. Hook revisions are frozen with a comment showing the upstream tag; Renovate keeps these updated automatically.
 
 ### Dependency pinning and updates
 
