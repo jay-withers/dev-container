@@ -4,6 +4,14 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  BASE_TAG: ghcr.io/${{ github.repository }}/base:pr-${{ github.run_id }}
+
 jobs:
   changes:
     runs-on: ubuntu-24.04
@@ -18,15 +26,10 @@ jobs:
             images:
               - 'images/**'
 
-  build:
+  base:
     needs: changes
     if: needs.changes.outputs.images == 'true'
     runs-on: ubuntu-24.04
-    services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -39,61 +42,82 @@ jobs:
         with:
           driver-opts: network=host
 
-      # Build the base first and push it to the job-local registry so the
-      # terraform/k8s images can resolve it via their BASE_IMAGE build arg.
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build base image
         uses: docker/build-push-action@v7
         with:
           context: images/base
           platforms: linux/arm64
           push: true
-          tags: localhost:5000/base:test
+          tags: ${{ env.BASE_TAG }}
           cache-from: type=gha,scope=base
           cache-to: type=gha,mode=max,scope=base
 
-      - name: Build terraform image
+  leaves:
+    needs: base
+    if: needs.base.result == 'success'
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        image: [terraform, k8s]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+        with:
+          driver-opts: network=host
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build ${{ matrix.image }} image
         uses: docker/build-push-action@v7
         with:
-          context: images/terraform
+          context: images/${{ matrix.image }}
           platforms: linux/arm64
           load: true
           build-args: |
-            BASE_IMAGE=localhost:5000/base:test
-          tags: terraform:test
-          cache-from: type=gha,scope=terraform
-          cache-to: type=gha,mode=max,scope=terraform
+            BASE_IMAGE=${{ env.BASE_TAG }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.image }}:pr-${{ github.run_id }}
+          cache-from: type=gha,scope=${{ matrix.image }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}
 
-      - name: Build k8s image
-        uses: docker/build-push-action@v7
-        with:
-          context: images/k8s
-          platforms: linux/arm64
-          load: true
-          build-args: |
-            BASE_IMAGE=localhost:5000/base:test
-          tags: k8s:test
-          cache-from: type=gha,scope=k8s
-          cache-to: type=gha,mode=max,scope=k8s
-
-      - name: Smoke test terraform image
+      - name: Smoke test ${{ matrix.image }} image
         run: |
-          docker run --rm --platform linux/arm64 terraform:test bash -c "
-            az --version && \
-            node --version && \
-            pre-commit --version && \
-            checkov --version && \
-            tflint --version && \
-            terraform-docs --version
-          "
-
-      - name: Smoke test k8s image
-        run: |
-          docker run --rm --platform linux/arm64 k8s:test bash -c "
-            az --version && \
-            node --version && \
-            pre-commit --version && \
-            kubectl version --client && \
-            helm version && \
-            k9s version && \
-            kubectx --version
-          "
+          IMAGE=${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.image }}:pr-${{ github.run_id }}
+          if [ "${{ matrix.image }}" = "terraform" ]; then
+            docker run --rm --platform linux/arm64 "$IMAGE" bash -c "
+              az --version && \
+              node --version && \
+              pre-commit --version && \
+              checkov --version && \
+              tflint --version && \
+              terraform-docs --version
+            "
+          else
+            docker run --rm --platform linux/arm64 "$IMAGE" bash -c "
+              az --version && \
+              node --version && \
+              pre-commit --version && \
+              kubectl version --client && \
+              helm version && \
+              k9s version && \
+              kubectx --version
+            "
+          fi
