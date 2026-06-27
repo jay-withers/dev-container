@@ -1,4 +1,4 @@
-name: container-build
+name: ci-container-build
 
 on:
   pull_request:

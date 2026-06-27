@@ -108,11 +108,12 @@ make lint    # run all hooks against every file
 
 ## CI
 
-| Workflow          | When it runs                       | What it does                                                                                         |
-| ----------------- | ---------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `pre-commit`      | Every PR to `main`                 | Installs all tools and runs `pre-commit run --all-files` to validate hooks                           |
-| `container-build` | PRs that change `images/**`        | Builds base, terraform, and k8s images for `linux/arm64` via QEMU and smoke-tests each tool          |
-| `tag`             | Every merge to `main`              | Bumps the semver tag, then builds and publishes every image to GHCR with that tag and `latest`       |
+| Workflow             | When it runs                              | What it does                                                                                         |
+| -------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `ci-pre-commit`      | Every PR to `main`                        | Installs all tools and runs `pre-commit run --all-files` to validate hooks                           |
+| `ci-container-build` | PRs that change `images/**`               | Builds base, terraform, and k8s images for `linux/arm64` via QEMU and smoke-tests each tool          |
+| `cd-tag`             | Every merge to `main`                     | Bumps the semver tag, then calls `cd-publish` for the new version                                    |
+| `cd-publish`         | Called by `cd-tag`, or run manually       | Checks out the tag and builds/publishes every image to GHCR as that version and `latest`             |
 
 ## Dependency updates
 
@@ -123,6 +124,6 @@ make lint    # run all hooks against every file
 - Dockerfile `FROM` base images
 - Tool versions in Dockerfile ARGs across `images/base`, `images/terraform`, and `images/k8s`
 
-Renovate will auto-approve and auto-merge PRs (squash) once the `pre-commit` and `container-build` workflows pass.
+Renovate will auto-approve and auto-merge PRs (squash) once the `ci-pre-commit` and `ci-container-build` workflows pass.
 
 To enable it, install the [Renovate GitHub App](https://github.com/apps/renovate) on the repository.

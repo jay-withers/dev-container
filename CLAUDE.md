@@ -30,7 +30,7 @@ Images form a base + specialisation hierarchy under `images/`:
 - **`images/terraform/Dockerfile`** — `FROM` the base image (via the `BASE_IMAGE` build arg, defaulting to the published `:latest`). Adds TFLint, Checkov, terraform-docs, and tfenv (which manages the Terraform version via `.terraform-version` in the consuming repo's workspace).
 - **`images/k8s/Dockerfile`** — `FROM` the base image. Adds kubectl, kubectx, helm, and k9s.
 
-Specialised images switch to `USER root` to install, then back to `USER vscode`. To add a new image, create `images/<name>/Dockerfile` `FROM` the base and add it to the `leaves` matrix in `tag.yml` and the build/smoke-test steps in `container-build.yml`.
+Specialised images switch to `USER root` to install, then back to `USER vscode`. To add a new image, create `images/<name>/Dockerfile` `FROM` the base and add it to the `leaves` matrix in `cd-publish.yml` and the build/smoke-test steps in `ci-container-build.yml`.
 
 ### Pre-commit configuration
 
@@ -38,7 +38,7 @@ This repo's own hooks live in **`config/.pre-commit-config.yaml`** — secret sc
 
 ### Dependency pinning and updates
 
-Tool versions are declared as `ARG` values in each image's Dockerfile as full download URLs with `@sha256:` digests appended. **`renovate.json`** uses regex custom managers (scoped per Dockerfile via `fileMatch`) to parse these ARGs and raise PRs when new releases are available. Renovate also updates GitHub Actions pins, Dockerfile `FROM` base images, and pre-commit hook revisions. All Renovate PRs are auto-approved and auto-merged (squash) once CI passes.
+Tool versions are declared as `ARG` values in each image's Dockerfile as full download URLs with `@sha256:` digests appended. **`renovate.json`** uses regex custom managers (scoped per Dockerfile via `managerFilePaths`) to parse these ARGs and raise PRs when new releases are available. Renovate also updates GitHub Actions pins, Dockerfile `FROM` base images, and pre-commit hook revisions. All Renovate PRs are auto-approved and auto-merged (squash) once CI passes.
 
 ### Commit messages
 
@@ -46,6 +46,7 @@ Commits must follow [Conventional Commits](https://www.conventionalcommits.org/)
 
 ### CI
 
-- **`.github/workflows/pre-commit.yml`** — runs on PRs to `main`. Installs tools then runs `pre-commit run --all-files --config config/.pre-commit-config.yaml`. The `no-commit-to-branch` hook is skipped in CI via `SKIP=no-commit-to-branch`.
-- **`.github/workflows/container-build.yml`** — runs on PRs that change `images/**`. Builds the base image into a job-local registry, then builds the terraform and k8s images (`FROM` that base) for `linux/arm64` via QEMU and smoke-tests each tool. Nothing is pushed to GHCR.
-- **`.github/workflows/tag.yml`** — runs on merge to `main`. Bumps the semver tag, builds and pushes the base image to GHCR, then builds and pushes each leaf image (`terraform`, `k8s`) referencing the freshly published base at the same version. Each image is tagged with both the new version and `latest`.
+- **`.github/workflows/ci-pre-commit.yml`** — runs on PRs to `main`. Installs tools then runs `pre-commit run --all-files --config config/.pre-commit-config.yaml`. The `no-commit-to-branch` hook is skipped in CI via `SKIP=no-commit-to-branch`.
+- **`.github/workflows/ci-container-build.yml`** — runs on PRs that change `images/**`. Builds the base image into a job-local registry, then builds the terraform and k8s images (`FROM` that base) for `linux/arm64` via QEMU and smoke-tests each tool. Nothing is pushed to GHCR.
+- **`.github/workflows/cd-tag.yml`** — runs on merge to `main`. Bumps the semver tag, then calls `cd-publish.yml` (reusable workflow) for the new version. Guarded so publish only runs when a tag was actually created.
+- **`.github/workflows/cd-publish.yml`** — reusable (`workflow_call`) and manual (`workflow_dispatch`). Checks out the given tag, builds and pushes the base image to GHCR, then each leaf image (`terraform`, `k8s`) referencing the freshly published base at the same version. Each image is tagged with both the version and `latest`. Re-runnable against an existing tag without minting a new version.
