@@ -9,8 +9,8 @@
       "customType": "regex",
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "terraform-linters/tflint",
-      "fileMatch": [
-        "^\\.devcontainer/Dockerfile$"
+      "managerFilePaths": [
+        "^images/terraform/Dockerfile$"
       ],
       "matchStrings": [
         "ARG TFLINT_URL=\"https://github\\.com/terraform-linters/tflint/releases/download/v(?<currentValue>[^/]+)/[^\"]+\""
@@ -22,8 +22,8 @@
       "customType": "regex",
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "bridgecrewio/checkov",
-      "fileMatch": [
-        "^\\.devcontainer/Dockerfile$"
+      "managerFilePaths": [
+        "^images/terraform/Dockerfile$"
       ],
       "matchStrings": [
         "ARG CHECKOV_URL=\"https://github\\.com/bridgecrewio/checkov/releases/download/(?<currentValue>[^/]+)/[^\"]+\""
@@ -35,8 +35,8 @@
       "customType": "regex",
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "terraform-docs/terraform-docs",
-      "fileMatch": [
-        "^\\.devcontainer/Dockerfile$"
+      "managerFilePaths": [
+        "^images/terraform/Dockerfile$"
       ],
       "matchStrings": [
         "ARG TERRAFORM_DOCS_URL=\"https://github\\.com/terraform-docs/terraform-docs/releases/download/v(?<currentValue>[^/]+)/[^\"]+\""
@@ -48,8 +48,8 @@
       "customType": "regex",
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "pre-commit/pre-commit",
-      "fileMatch": [
-        "^\\.devcontainer/Dockerfile$"
+      "managerFilePaths": [
+        "^images/base/Dockerfile$"
       ],
       "matchStrings": [
         "ARG PRE_COMMIT_URL=\"https://github\\.com/pre-commit/pre-commit/releases/download/v(?<currentValue>[^/]+)/[^\"]+\""
@@ -61,8 +61,8 @@
       "customType": "regex",
       "datasourceTemplate": "node-version",
       "depNameTemplate": "node",
-      "fileMatch": [
-        "^\\.devcontainer/Dockerfile$"
+      "managerFilePaths": [
+        "^images/base/Dockerfile$"
       ],
       "matchStrings": [
         "ARG NODE_URL=\"https://nodejs\\.org/dist/v(?<currentValue>[^/]+)/[^\"]+\""
@@ -73,8 +73,8 @@
       "customType": "regex",
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "kubernetes/kubernetes",
-      "fileMatch": [
-        "^\\.devcontainer/Dockerfile$"
+      "managerFilePaths": [
+        "^images/k8s/Dockerfile$"
       ],
       "matchStrings": [
         "ARG KUBECTL_URL=\"https://dl\\.k8s\\.io/release/v(?<currentValue>[^/]+)/[^\"]+\""
@@ -86,8 +86,8 @@
       "customType": "regex",
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "helm/helm",
-      "fileMatch": [
-        "^\\.devcontainer/Dockerfile$"
+      "managerFilePaths": [
+        "^images/k8s/Dockerfile$"
       ],
       "matchStrings": [
         "ARG HELM_URL=\"https://get\\.helm\\.sh/helm-v(?<currentValue>[^-]+)-[^\"]+\""
@@ -99,8 +99,8 @@
       "customType": "regex",
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "derailed/k9s",
-      "fileMatch": [
-        "^\\.devcontainer/Dockerfile$"
+      "managerFilePaths": [
+        "^images/k8s/Dockerfile$"
       ],
       "matchStrings": [
         "ARG K9S_URL=\"https://github\\.com/derailed/k9s/releases/download/v(?<currentValue>[^/]+)/[^\"]+\""
@@ -127,14 +127,16 @@
     },
     {
       "groupName": "dev container tools",
-      "matchFiles": [
-        ".devcontainer/Dockerfile"
+      "matchFileNames": [
+        "images/base/Dockerfile",
+        "images/terraform/Dockerfile",
+        "images/k8s/Dockerfile"
       ]
     }
   ],
   "platformAutomerge": true,
   "pre-commit": {
-    "fileMatch": [
+    "managerFilePaths": [
       "(^|/)config/\\.pre-commit-config\\.yaml$"
     ]
   },

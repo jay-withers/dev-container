@@ -1,4 +1,4 @@
-name: pre-commit
+name: ci-pre-commit
 
 on:
   pull_request:
@@ -21,27 +21,6 @@ jobs:
         with:
           node-version: "24"
 
-      - name: Install tfenv
-        run: |
-          git clone --depth=1 https://github.com/tfutils/tfenv.git ~/.tfenv
-          echo "$HOME/.tfenv/bin" >> "$GITHUB_PATH"
-
-      - name: Install Terraform
-        run: tfenv install
-
-      - name: Set up TFLint
-        uses: terraform-linters/setup-tflint@v6
-        with:
-          tflint_version: "v0.61.0"
-
-      - name: Install Checkov
-        run: pip install checkov==3.2.529
-
-      - name: Install terraform-docs
-        run: |
-          curl -fsSL https://github.com/terraform-docs/terraform-docs/releases/download/v0.24.0/terraform-docs-v0.24.0-linux-amd64.tar.gz \
-            | tar -xz -C /usr/local/bin terraform-docs
-
       - name: Install actionlint
         run: |
           curl -fsSL https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz \
@@ -60,10 +39,6 @@ jobs:
         with:
           path: ~/.cache/pre-commit
           key: pre-commit-${{ hashFiles('config/.pre-commit-config.yaml') }}
-
-      - name: Terraform init
-        run: terraform init
-        working-directory: terraform
 
       - name: Run pre-commit
         env:

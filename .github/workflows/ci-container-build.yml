@@ -1,0 +1,123 @@
+name: ci-container-build
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  BASE_TAG: ghcr.io/${{ github.repository }}/base:pr-${{ github.run_id }}
+
+jobs:
+  changes:
+    runs-on: ubuntu-24.04
+    outputs:
+      images: ${{ steps.filter.outputs.images }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            images:
+              - 'images/**'
+
+  base:
+    needs: changes
+    if: needs.changes.outputs.images == 'true'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+        with:
+          driver-opts: network=host
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build base image
+        uses: docker/build-push-action@v7
+        with:
+          context: images/base
+          platforms: linux/arm64
+          push: true
+          tags: ${{ env.BASE_TAG }}
+          cache-from: type=gha,scope=base
+          cache-to: type=gha,mode=max,scope=base
+
+  leaves:
+    needs: base
+    if: needs.base.result == 'success'
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        image: [terraform, k8s]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+        with:
+          driver-opts: network=host
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build ${{ matrix.image }} image
+        uses: docker/build-push-action@v7
+        with:
+          context: images/${{ matrix.image }}
+          platforms: linux/arm64
+          load: true
+          build-args: |
+            BASE_IMAGE=${{ env.BASE_TAG }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.image }}:pr-${{ github.run_id }}
+          cache-from: type=gha,scope=${{ matrix.image }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}
+
+      - name: Smoke test ${{ matrix.image }} image
+        run: |
+          IMAGE=${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.image }}:pr-${{ github.run_id }}
+          if [ "${{ matrix.image }}" = "terraform" ]; then
+            docker run --rm --platform linux/arm64 "$IMAGE" bash -c "
+              az --version && \
+              node --version && \
+              pre-commit --version && \
+              checkov --version && \
+              tflint --version && \
+              terraform-docs --version
+            "
+          else
+            docker run --rm --platform linux/arm64 "$IMAGE" bash -c "
+              az --version && \
+              node --version && \
+              pre-commit --version && \
+              kubectl version --client && \
+              helm version && \
+              k9s version && \
+              kubectx --version
+            "
+          fi
