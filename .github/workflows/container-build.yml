@@ -8,20 +8,25 @@ jobs:
   changes:
     runs-on: ubuntu-24.04
     outputs:
-      devcontainer: ${{ steps.filter.outputs.devcontainer }}
+      images: ${{ steps.filter.outputs.images }}
     steps:
       - uses: actions/checkout@v7
       - uses: dorny/paths-filter@v3
         id: filter
         with:
           filters: |
-            devcontainer:
-              - '.devcontainer/**'
+            images:
+              - 'images/**'
 
   build:
     needs: changes
-    if: needs.changes.outputs.devcontainer == 'true'
+    if: needs.changes.outputs.images == 'true'
     runs-on: ubuntu-24.04
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -31,27 +36,62 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
+        with:
+          driver-opts: network=host
 
-      - name: Build container image
+      # Build the base first and push it to the job-local registry so the
+      # terraform/k8s images can resolve it via their BASE_IMAGE build arg.
+      - name: Build base image
         uses: docker/build-push-action@v7
         with:
-          context: .devcontainer
+          context: images/base
           platforms: linux/arm64
-          push: false
-          load: true
-          tags: dev-container:test
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          push: true
+          tags: localhost:5000/base:test
+          cache-from: type=gha,scope=base
+          cache-to: type=gha,mode=max,scope=base
 
-      - name: Smoke test
+      - name: Build terraform image
+        uses: docker/build-push-action@v7
+        with:
+          context: images/terraform
+          platforms: linux/arm64
+          load: true
+          build-args: |
+            BASE_IMAGE=localhost:5000/base:test
+          tags: terraform:test
+          cache-from: type=gha,scope=terraform
+          cache-to: type=gha,mode=max,scope=terraform
+
+      - name: Build k8s image
+        uses: docker/build-push-action@v7
+        with:
+          context: images/k8s
+          platforms: linux/arm64
+          load: true
+          build-args: |
+            BASE_IMAGE=localhost:5000/base:test
+          tags: k8s:test
+          cache-from: type=gha,scope=k8s
+          cache-to: type=gha,mode=max,scope=k8s
+
+      - name: Smoke test terraform image
         run: |
-          docker run --rm --platform linux/arm64 dev-container:test bash -c "
+          docker run --rm --platform linux/arm64 terraform:test bash -c "
             az --version && \
+            node --version && \
+            pre-commit --version && \
             checkov --version && \
             tflint --version && \
-            terraform-docs --version && \
-            pre-commit --version && \
+            terraform-docs --version
+          "
+
+      - name: Smoke test k8s image
+        run: |
+          docker run --rm --platform linux/arm64 k8s:test bash -c "
+            az --version && \
             node --version && \
+            pre-commit --version && \
             kubectl version --client && \
             helm version && \
             k9s version && \
